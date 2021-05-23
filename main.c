@@ -7,36 +7,35 @@ void printLRUList() {
     printf("\n------------[LRU list]---------------\n");
     Buf *item;
     TAILQ_FOREACH(item, &pLruListHead, llist) {
-        printf("blkno[%d]: %s -> ", item->blkno, (char *)item->pMem);
+        printf("blkno[%d]: %s\n", item->blkno, (char *)item->pMem);
     }
-    printf("\n-------------------------------------\n");
+    printf("\n");
 }
 
 void printStateList() {
     printf("\n------------[CLEAN list]---------------\n");
     Buf *item;
     TAILQ_FOREACH(item, &ppStateListHead[BUF_LIST_CLEAN], slist) {
-        printf("blkno[%d]: %s -> ", item->blkno, (char *)item->pMem);
+        printf("blkno[%d]: %s\n", item->blkno, (char *)item->pMem);
     }
-    printf("\n-------------------------------------\n");
+    printf("\n");
     printf("\n------------[DIRTY list]---------------\n");
     TAILQ_FOREACH(item, &ppStateListHead[BUF_LIST_DIRTY], slist) {
-        printf("blkno[%d]: %s -> ", item->blkno, (char *)item->pMem);
+        printf("blkno[%d]: %s\n", item->blkno, (char *)item->pMem);
     }
-    printf("\n-------------------------------------\n");
 }
 
 void printBufList() {
     printf("\n------------[BUF list]---------------\n");
     Buf *item;
     for (int i = 0; i < HASH_ENTRY_NUM; i++) {
-        printf("Hash[%d]", i);
+        printf("Hash[%d] -> ", i);
         TAILQ_FOREACH(item, &ppBufList[i], blist) {
-            printf(" -> blkno[%d]: %s", item->blkno, (char *)item->pMem);
+            printf("blkno[%d]: %s\n", item->blkno, (char *)item->pMem);
         }
         printf("\n");
     }
-    printf("\n-------------------------------------\n");
+    printf("\n");
 }
 
 void printDisk() {
@@ -45,9 +44,9 @@ void printDisk() {
     for (int i = 0; i < 10; i++) {
         char *pMem = malloc(BLOCK_SIZE);
         DevReadBlock(i, pMem);
-        printf(" -> blkno[%d]: %s", i, pMem);
+        printf("blkno[%d]: %s\n", i, pMem);
     }
-    printf("\n-------------------------------------\n");
+    printf("\n");
 }
 
 int main(void) {
@@ -68,7 +67,7 @@ int main(void) {
     printBufList();
     printDisk();
 
-    printf("\n-----------------------\n");
+    printf("\n------------------[AFTER]-------------------\n");
 
     BufRead(0, pData);
     BufRead(1, pData);
