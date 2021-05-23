@@ -10,7 +10,6 @@ void printLRUList() {
         printf("blkno[%d]: %s\n", item->blkno, (char *)item->pMem);
     }
     printf("\n");
-    // printf("\n-------------------------------------\n");
 }
 
 void printStateList() {
@@ -20,26 +19,23 @@ void printStateList() {
         printf("blkno[%d]: %s\n", item->blkno, (char *)item->pMem);
     }
     printf("\n");
-    // printf("\n-------------------------------------\n");
     printf("\n------------[DIRTY list]---------------\n");
     TAILQ_FOREACH(item, &ppStateListHead[BUF_LIST_DIRTY], slist) {
         printf("blkno[%d]: %s\n", item->blkno, (char *)item->pMem);
     }
-    // printf("\n-------------------------------------\n");
 }
 
 void printBufList() {
     printf("\n------------[BUF list]---------------\n");
     Buf *item;
     for (int i = 0; i < HASH_ENTRY_NUM; i++) {
-        printf("Hash[%d]", i);
+        printf("Hash[%d] -> ", i);
         TAILQ_FOREACH(item, &ppBufList[i], blist) {
             printf("blkno[%d]: %s\n", item->blkno, (char *)item->pMem);
         }
         printf("\n");
     }
     printf("\n");
-    // printf("\n-------------------------------------\n");
 }
 
 void printDisk() {
@@ -51,7 +47,6 @@ void printDisk() {
         printf("blkno[%d]: %s\n", i, pMem);
     }
     printf("\n");
-    // printf("\n-------------------------------------\n");
 }
 
 int main(void) {
