@@ -26,7 +26,7 @@ void printStateList() {
 }
 
 void printBufList() {
-    printf("\n------------[BUF list]---------------\n");
+    printf("\n-------------[BUF list]----------------\n");
     Buf *item;
     for (int i = 0; i < HASH_ENTRY_NUM; i++) {
         printf("Hash[%d] -> ", i);
@@ -39,7 +39,7 @@ void printBufList() {
 }
 
 void printDisk() {
-    printf("\n------------[DISK]---------------\n");
+    printf("\n---------------[DISK]------------------\n");
 
     for (int i = 0; i < 10; i++) {
         char *pMem = malloc(BLOCK_SIZE);
