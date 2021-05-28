@@ -6,6 +6,8 @@
 #include <string.h>
 
 void BufInit(void) {
+    DevCreateDisk();
+    DevOpenDisk();
     for (int i = 0; i < HASH_ENTRY_NUM; i++) {
         TAILQ_INIT(&ppBufList[i]);
     }
@@ -25,7 +27,7 @@ void BufRead(int blkno, char *pData) {
         for (int i = 0; i < HASH_ENTRY_NUM; i++) {
             TAILQ_FOREACH(temp, &ppBufList[i], blist) { cnt++; }
         }
-        if (cnt == MAX_BUF_NUM) {
+        if (cnt >= MAX_BUF_NUM) {
             temp = TAILQ_FIRST(&pLruListHead);
             TAILQ_REMOVE(&ppBufList[temp->blkno % HASH_ENTRY_NUM], temp, blist);
             TAILQ_REMOVE(&ppStateListHead[temp->state], temp, slist);
@@ -34,16 +36,18 @@ void BufRead(int blkno, char *pData) {
                 DevWriteBlock(temp->blkno, temp->pMem);
                 temp->state = BUF_STATE_CLEAN;
             }
+            DevReadBlock(blkno, temp->pMem);
+            memcpy(pData, temp->pMem, BLOCK_SIZE);
             temp->blkno = blkno;
             TAILQ_INSERT_TAIL(&ppStateListHead[temp->state], temp, slist);
             TAILQ_INSERT_HEAD(&ppBufList[temp->blkno % HASH_ENTRY_NUM], temp,
                               blist);
             TAILQ_INSERT_TAIL(&pLruListHead, temp, llist);
-            DevReadBlock(blkno, temp->pMem);
         } else {
             item = malloc(sizeof(Buf));
             item->pMem = malloc(BLOCK_SIZE);
             DevReadBlock(blkno, item->pMem);
+            memcpy(pData, item->pMem, BLOCK_SIZE);
             item->state = BUF_STATE_CLEAN;
             item->blkno = blkno;
             TAILQ_INSERT_TAIL(&ppStateListHead[item->state], item, slist);
@@ -57,7 +61,7 @@ void BufWrite(int blkno, char *pData) {
     Buf *item = BufGet(blkno);
     Buf *temp;
     if (item != NULL) {
-        memcpy(pData, item->pMem, BLOCK_SIZE);
+        memcpy(item->pMem, pData, BLOCK_SIZE);
         if (item->state == BUF_LIST_CLEAN) {
             TAILQ_REMOVE(&ppStateListHead[BUF_LIST_CLEAN], item, slist);
             item->state = BUF_STATE_DIRTY;
@@ -98,6 +102,7 @@ void BufSync(void) {
             if (temp->state == BUF_STATE_DIRTY) {
                 DevWriteBlock(temp->blkno, temp->pMem);
                 temp->state = BUF_STATE_CLEAN;
+                TAILQ_REMOVE(&ppStateListHead[BUF_LIST_DIRTY], temp, slist);
                 TAILQ_INSERT_TAIL(&ppStateListHead[BUF_LIST_CLEAN], temp,
                                   slist);
             }
@@ -120,6 +125,7 @@ void BufSyncBlock(int blkno) {
         if (temp->state == BUF_STATE_DIRTY && temp->blkno == blkno) {
             DevWriteBlock(temp->blkno, temp->pMem);
             temp->state = BUF_STATE_CLEAN;
+            TAILQ_REMOVE(&ppStateListHead[BUF_LIST_DIRTY], temp, slist);
             TAILQ_INSERT_TAIL(&ppStateListHead[BUF_LIST_CLEAN], temp, slist);
         }
     }

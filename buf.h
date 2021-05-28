@@ -3,7 +3,7 @@
 #include "queue.h"
 
 #define MAX_BUFLIST_NUM (2)
-#define MAX_BUF_NUM (3)
+#define MAX_BUF_NUM (16)
 #define BLKNO_INVALID (-1)
 #define HASH_ENTRY_NUM (4)
 
